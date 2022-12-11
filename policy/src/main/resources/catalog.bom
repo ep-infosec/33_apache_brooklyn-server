@@ -1,0 +1,146 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+brooklyn.catalog:
+  version: "1.1.0-SNAPSHOT" # BROOKLYN_VERSION
+  items:
+
+  - itemType: policy
+    items:
+    - id: org.apache.brooklyn.policy.ha.ConnectionFailureDetector
+      item:
+        type: org.apache.brooklyn.policy.ha.ConnectionFailureDetector
+        name: Connection Failure Detector
+        description: HA policy for monitoring a host:port, emitting an event if the connection is lost/restored
+    - id: org.apache.brooklyn.policy.ha.ServiceRestarter
+      item:
+        type: org.apache.brooklyn.policy.ha.ServiceRestarter
+        name: Service Restarter
+        iconUrl: classpath://org/apache/brooklyn/policy/ha/service-restarter.png
+        description: HA policy for restarting a service automatically, and for emitting an events if the service repeatedly fails
+    - id: org.apache.brooklyn.policy.ha.SshMachineFailureDetector
+      item:
+        type: org.apache.brooklyn.policy.ha.SshMachineFailureDetector
+        name: Ssh Connectivity Failure Detector
+        description: HA policy for monitoring an SshMachine, emitting an event if the connection is lost/restored
+    - id: org.apache.brooklyn.policy.ha.ServiceReplacer
+      item:
+        type: org.apache.brooklyn.policy.ha.ServiceReplacer
+        name: Service Replacer
+        iconUrl: classpath://org/apache/brooklyn/policy/ha/service-replacer.png
+        description: HA policy for replacing a failed member of a group
+    - id: org.apache.brooklyn.policy.autoscaling.AutoScalerPolicy
+      item:
+        type: org.apache.brooklyn.policy.autoscaling.AutoScalerPolicy
+        name: Auto-scaler
+        iconUrl: classpath://org/apache/brooklyn/policy/autoscaler.png
+        description: |
+          Policy that is attached to a Resizable entity and dynamically adjusts its size in 
+          response to either keep a metric within a given range, or in response to 
+          POOL_COLD and POOL_HOT events
+    - id: org.apache.brooklyn.policy.action.PeriodicEffectorPolicy
+      itemType: policy
+      item:
+        type: org.apache.brooklyn.policy.action.PeriodicEffectorPolicy
+        name: Periodic Effector Execution
+        description: |
+          Policy that executes an effector repeatedly at configurable intervals.
+    - id: org.apache.brooklyn.policy.action.ScheduledEffectorPolicy
+      itemType: policy
+      item:
+        type: org.apache.brooklyn.policy.action.ScheduledEffectorPolicy
+        name: Scheduled Effector Execution
+        description: |
+          Policy that executes an effector at a configurable time or after
+          a configurable delay.
+    - id: org.apache.brooklyn.policy.failover.ElectPrimaryPolicy
+      itemType: policy
+      item:
+        type: org.apache.brooklyn.policy.failover.ElectPrimaryPolicy
+        name: Elect Primary Policy
+        description: |
+          Acts to keep exactly one of its children or members as primary, promoting and demoting them when required.
+          For example, used for failover in high availability or disaster recovery.
+
+#  Removed from catalog because 'FollowTheSunPool' cannot currently be configured via catalog mechanisms.
+#  Also removing associated 'BalanceableWorkerPool' etc as they are only useful with 'FollowTheSunPool'
+#  - itemType: entity
+#    items:
+#    - id: org.apache.brooklyn.policy.followthesun.FollowTheSunPool
+#      item:
+#        type: org.apache.brooklyn.policy.followthesun.FollowTheSunPool
+#    - id: org.apache.brooklyn.policy.loadbalancing.BalanceableWorkerPool
+#      item:
+#        type: org.apache.brooklyn.policy.loadbalancing.BalanceableWorkerPool
+#    - id: org.apache.brooklyn.policy.loadbalancing.ItemsInContainersGroup
+#      item:
+#        type: org.apache.brooklyn.policy.loadbalancing.ItemsInContainersGroup
+
+  - itemType: enricher
+    items:
+    - id: org.apache.brooklyn.policy.enricher.DeltaEnricher
+      item:
+        type: org.apache.brooklyn.policy.enricher.DeltaEnricher
+        name: Delta
+        description: Converts an absolute sensor into a delta sensor (i.e. the diff between the current and previous value)
+    - id: org.apache.brooklyn.policy.enricher.HttpLatencyDetector
+      item:
+        type: org.apache.brooklyn.policy.enricher.HttpLatencyDetector
+        name: HTTP Latency Detector
+        description: Computes latency in accessing a URL, normally by periodically polling that URL
+    - id: org.apache.brooklyn.policy.enricher.RollingMeanEnricher
+      item:
+        type: org.apache.brooklyn.policy.enricher.RollingMeanEnricher
+        name: Rolling Mean
+        description: |
+          Transforms a sensor into a rolling average based on a fixed window size. 
+          This is useful for smoothing sample type metrics, such as latency or CPU time.
+    - id: org.apache.brooklyn.enricher.stock.YamlRollingTimeWindowMeanEnricher
+      item:
+        type: org.apache.brooklyn.enricher.stock.YamlRollingTimeWindowMeanEnricher
+        name: "Rolling Mean in Time Window"
+        description: "Transforms sensor data into a rolling average based on a time window"
+    - id: org.apache.brooklyn.policy.enricher.TimeFractionDeltaEnricher
+      item:
+        type: org.apache.brooklyn.policy.enricher.TimeFractionDeltaEnricher
+        name: Time-fraction Delta
+        description: |
+          Converts an absolute measure of time into a fraction of time,
+          based on the delta between consecutive values and the elapsed time between those values.
+    - id: org.apache.brooklyn.enricher.stock.YamlTimeWeightedDeltaEnricher
+      item:
+        type: org.apache.brooklyn.enricher.stock.YamlTimeWeightedDeltaEnricher
+        name: "Time Weighted Delta"
+        description: "Converts an absolute count sensor into a delta sensor"
+    - id: org.apache.brooklyn.policy.ha.ServiceFailureDetector
+      item:
+        type: org.apache.brooklyn.policy.ha.ServiceFailureDetector
+        name: Service Failure Detector
+        description: Emits a new sensor if the current entity fails
+    - id: org.apache.brooklyn.policy.failover.PrimaryRunningEnricher
+      item:
+        type: org.apache.brooklyn.policy.failover.PrimaryRunningEnricher
+        name: Primary Running
+        description: |
+          Records if the elected primary child/member is running, updating service state 
+          of this entity.
+    - id: org.apache.brooklyn.policy.failover.PropagatePrimaryEnricher 
+      item:
+        type: org.apache.brooklyn.policy.failover.PropagatePrimaryEnricher
+        name: Propagate Primary
+        description: Makes selected sensors mirrored from the primary to this entity.
+

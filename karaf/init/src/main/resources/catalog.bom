@@ -1,0 +1,271 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#    
+#   http://www.apache.org/licenses/LICENSE-2.0
+#    
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+brooklyn.catalog:
+  version: "1.1.0-SNAPSHOT" # BROOKLYN_VERSION
+
+  items:
+  # provides aliases for the most common items
+  # (used to import the other bundles but now this is done by dist feature catalog-core)
+  - id: server
+    iconUrl: classpath://brooklyn/icons/server.svg
+    description: |
+      Provision a server, with customizable provisioning.properties and credentials installed,
+      but no other special software process or scripts executed.
+    item:
+      type: org.apache.brooklyn.entity.software.base.EmptySoftwareProcess
+      name: Server
+      iconUrl: classpath://brooklyn/icons/server.svg
+
+  - id: cluster
+    iconUrl: classpath://brooklyn/icons/cluster.svg
+    description: |
+      Create a cluster of entities, resizable, with starting size "initialSize",
+      and using a spec supplied in the "memberSpec" key.
+    item:
+      type: org.apache.brooklyn.entity.group.DynamicCluster
+      iconUrl: classpath://brooklyn/icons/cluster.svg
+
+  - id:                      group
+    itemType:                entity
+    name:                    Group
+    iconUrl:                 classpath://brooklyn/icons/group.png
+    item:
+      type:                  org.apache.brooklyn.entity.group.BasicGroup
+
+  - id:                      dynamic-group
+    itemType:                entity
+    name:                    Dynamic Group
+    iconUrl:                 classpath://brooklyn/icons/dynamic-group-cloud.png
+    item:
+      type:                  org.apache.brooklyn.entity.group.DynamicGroup
+
+
+  - id: ssh-command-sensor
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.sensor.ssh.SshCommandSensor
+  - id: ssh-command-effector
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.effector.ssh.SshCommandEffector
+
+  - id: container-sensor
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.tasks.kubectl.ContainerSensor
+  - id: container-effector
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.tasks.kubectl.ContainerEffector
+
+  # workflow steps
+  - id: log
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.flow.LogWorkflowStep
+  - id: sleep
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.flow.SleepWorkflowStep
+  - id: no-op
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.flow.NoOpWorkflowStep
+
+  - id: set-config
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.appmodel.SetConfigWorkflowStep
+  - id: clear-config
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.appmodel.ClearConfigWorkflowStep
+
+  - id: set-sensor
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.appmodel.SetSensorWorkflowStep
+  - id: clear-sensor
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.appmodel.ClearSensorWorkflowStep
+
+  - id: set-workflow-variable
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.variables.SetVariableWorkflowStep
+  - id: clear-workflow-variable
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.variables.ClearVariableWorkflowStep
+  - id: let
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.variables.SetVariableWorkflowStep
+  - id: transform
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.variables.TransformVariableWorkflowStep
+  - id: wait
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.variables.WaitWorkflowStep
+  - id: load
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.variables.LoadWorkflowStep
+  - id: return
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.flow.ReturnWorkflowStep
+  - id: goto
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.flow.GotoWorkflowStep
+  - id: switch
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.flow.SwitchWorkflowStep
+  - id: fail
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.flow.FailWorkflowStep
+
+  - id: workflow
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.CustomWorkflowStep
+  - id: retry
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.flow.RetryWorkflowStep
+
+  - id: invoke-effector
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.appmodel.InvokeEffectorWorkflowStep
+  - id: deploy-application
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.appmodel.DeployApplicationWorkflowStep
+  - id: add-entity
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.appmodel.AddEntityWorkflowStep
+  - id: delete-entity
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.appmodel.DeleteEntityWorkflowStep
+  - id: reparent-entity
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.appmodel.ReparentEntityWorkflowStep
+  - id: add-policy
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.appmodel.AddPolicyWorkflowStep
+  - id: delete-policy
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.appmodel.DeletePolicyWorkflowStep
+  - id: apply-initializer
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.appmodel.ApplyInitializerWorkflowStep
+
+  - id: ssh
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.external.SshWorkflowStep
+  - id: http
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.steps.external.HttpWorkflowStep
+  - id: container
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.tasks.kubectl.ContainerWorkflowStep
+  - id: winrm
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.location.winrm.WinrmWorkflowStep
+
+  # workflow initializers
+  - id: workflow-initializer
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.WorkflowInitializer
+  - id: workflow-effector
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.WorkflowEffector
+  - id: workflow-sensor
+    format: java-type-name
+    itemType: bean
+    item:
+      type: org.apache.brooklyn.core.workflow.WorkflowSensor
+  - id: workflow-policy
+    itemType: policy
+    item:
+      type: org.apache.brooklyn.core.workflow.WorkflowPolicy
+
+  - id: workflow-entity
+    itemType: entity
+    item:
+      type: org.apache.brooklyn.entity.stock.WorkflowStartable
+  - id: workflow-software-process
+    itemType: entity
+    item:
+      type: org.apache.brooklyn.entity.software.base.WorkflowSoftwareProcess

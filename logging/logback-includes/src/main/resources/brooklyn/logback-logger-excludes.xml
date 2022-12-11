@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+    
+     http://www.apache.org/licenses/LICENSE-2.0
+    
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<included>
+    
+    <!-- sshj very noisy, profligate with errors, put to file only, at warn level -->
+    <logger name="net.schmizz" level="WARN" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <!-- quite noisy at INFO, and uninteresting -->
+    <logger name="org.eclipse.jetty" level="WARN"/>
+    
+    <!-- a bit noisy at INFO, but still, poss interesting; put to file only -->
+    <logger name="org.reflections.Reflections" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="com.sun.jersey.server.impl.application" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="org.apache.whirr.service.ComputeCache" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="jclouds.ssh" additivity="false">
+        <!-- sometimes get '<< error authenticating (1 of 50)' at info when machine is booting, which get fixed soon after -->
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <!-- also noisy, using java.util.logging; see LoggingSetup for info on ensuring these get intercepted -->
+    <logger name="org.apache.http.impl.client" additivity="false">
+        <!-- DefaultHttpClient logs info e.g. about "Retrying request" on NoHttpResponseException -->
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="javax.management.remote" additivity="false">
+        <!-- Logger used by Sun JMX code warns if connections die, even if we know that is normal (because we killed the other end!) -->
+        <appender-ref ref="FILE" />
+    </logger>
+	<logger name="com.wordnik.swagger" additivity="false">
+		<!-- Wordnik logs errors in a few places which aren't errors at all; ignore them altogether (not even to a file, because it makes lots of ERROR lines).
+		     (Turn them back on if you need to see how API-doc gets generated, and also see https://github.com/wordnik/swagger-core/issues/58) -->
+	</logger>
+
+    <!-- Gives spurious warnings -->
+    <logger name="org.jclouds.location.suppliers.implicit.GetRegionIdMatchingProviderURIOrNull" level="ERROR" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    <!-- The MongoDB Java driver is much too noisy at INFO. -->
+    <logger name="org.mongodb.driver" level="WARN" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    <!-- Also very noisy even at WARN, if you have [profile xxx] in your ~/.aws/config file;
+         as with o.a.http above, this requires our custom bridge from LoggingSetup to be configured, or comparable -->
+    <logger name="com.amazonaws.auth.profile.internal.BasicProfileConfigLoader" level="ERROR" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <!-- CXF logging is extremely verbose, including 
+         debug logging for every REST in and out,
+         and warns and errors which we catch and handle;
+         it might be nice to keep the latter, but they show up in info log (no way to say debug file only?),
+         so simplest is to disable all but severe -->
+    <logger name="org.apache.cxf" level="ERROR"/>
+    <!-- Also fairly verbose, and included a warning about ch.qos.logback.classic.servlet.LogbackServletContainerInitializer
+         `o.o.p.w.u.ServletContainerInitializerScanner [pache.cxf.osgi])] failed to parse and instantiate of javax.servlet.ServletContainerInitializer in classpath`;
+         could possibly be fixed with bundle load order but logging from the web bundles seems fine so not worth it -->
+    <logger name="org.ops4j.pax.web.utils.ServletContainerInitializerScanner" level="ERROR"/>
+    <!-- Again verbose, warning about No HttpConfig Element found in jetty.xml, using default -->
+    <logger name="org.ops4j.pax.web.service.jetty.internal.JettyFactoryImpl" level="ERROR"/>
+
+</included>

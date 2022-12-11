@@ -1,0 +1,130 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.brooklyn.util.core.http;
+
+import static org.testng.Assert.assertTrue;
+
+import java.net.URI;
+
+import org.apache.brooklyn.util.exceptions.PropagatedRuntimeException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpOptions;
+import org.apache.http.client.methods.HttpTrace;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.apache.brooklyn.core.location.PortRanges;
+import org.apache.brooklyn.core.test.HttpService;
+import org.apache.brooklyn.util.http.HttpTool;
+import org.apache.brooklyn.util.http.HttpToolResponse;
+
+import com.google.common.collect.ImmutableMap;
+
+public class HttpToolIntegrationTest {
+
+    // TODO Expand test coverage for credentials etc
+    
+    private HttpService httpService;
+    private HttpService httpsService;
+
+    @BeforeMethod(alwaysRun=true)
+    public void setUp() throws Exception {
+        httpService = new HttpService(PortRanges.fromString("9000+"), false).start();
+        httpsService = new HttpService(PortRanges.fromString("9000+"), true).start();
+    }
+    
+    @AfterMethod(alwaysRun=true)
+    public void tearDown() throws Exception {
+        if (httpService != null) httpService.shutdown();
+        if (httpsService != null) httpsService.shutdown();
+    }
+
+    @Test(expectedExceptions = PropagatedRuntimeException.class)
+    public void testHttpRequestBuilderThrowsExIfBodySetForGet() throws Exception {
+        new HttpTool.HttpRequestBuilder<>(HttpGet.class).body("test").build();
+    }
+
+    @Test(expectedExceptions = PropagatedRuntimeException.class)
+    public void testHttpRequestBuilderThrowsExIfBodySetForDelete() throws Exception {
+        new HttpTool.HttpRequestBuilder<>(HttpDelete.class).body("test").build();
+    }
+
+    @Test(expectedExceptions = PropagatedRuntimeException.class)
+    public void testHttpRequestBuilderThrowsExIfBodySetForHead() throws Exception {
+        new HttpTool.HttpRequestBuilder<>(HttpHead.class).body("test").build();
+    }
+
+    @Test(expectedExceptions = PropagatedRuntimeException.class)
+    public void testHttpRequestBuilderThrowsExIfBodySetForOptions() throws Exception {
+        new HttpTool.HttpRequestBuilder<>(HttpOptions.class).body("test").build();
+    }
+
+    @Test(expectedExceptions = PropagatedRuntimeException.class)
+    public void testHttpRequestBuilderThrowsExIfBodySetForTrace() throws Exception {
+        new HttpTool.HttpRequestBuilder<>(HttpTrace.class).body("test").build();
+    }
+
+    @Test(groups = {"Integration"})
+    public void testHttpGet() throws Exception {
+        URI baseUri = new URI(httpService.getUrl());
+
+        HttpClient client = HttpTool.httpClientBuilder().build();
+        HttpToolResponse result = HttpTool.httpGet(client, baseUri, ImmutableMap.<String,String>of());
+        assertTrue(new String(result.getContent()).contains("Hello, World"), "val="+new String(result.getContent()));
+    }
+    
+    @Test(groups = {"Integration"})
+    public void testHttpRedirect() throws Exception {
+        URI baseUri = new URI(httpService.getUrl() + "hello/redirectAbsolute");
+
+        HttpClient client = HttpTool.httpClientBuilder().laxRedirect(true).build();
+        HttpToolResponse result = HttpTool.httpGet(client, baseUri, ImmutableMap.<String,String>of());
+        assertTrue(new String(result.getContent()).contains("Hello, World"), "val="+new String(result.getContent()));
+    }
+    
+    @Test(groups = {"Integration"})
+    public void testHttpPost() throws Exception {
+        URI baseUri = new URI(httpService.getUrl());
+
+        HttpClient client = HttpTool.httpClientBuilder().build();
+        HttpToolResponse result = HttpTool.httpPost(client, baseUri, ImmutableMap.<String,String>of(), new byte[0]);
+        assertTrue(new String(result.getContent()).contains("Hello, World"), "val="+new String(result.getContent()));
+    }
+    
+    @Test(groups = {"Integration"})
+    public void testHttpsGetWithTrustAll() throws Exception {
+        URI baseUri = new URI(httpsService.getUrl());
+
+        HttpClient client = HttpTool.httpClientBuilder().https(true).trustAll().build();
+        HttpToolResponse result = HttpTool.httpGet(client, baseUri, ImmutableMap.<String,String>of());
+        assertTrue(new String(result.getContent()).contains("Hello, World"), "val="+new String(result.getContent()));
+    }
+    
+    @Test(groups = {"Integration"})
+    public void testHttpsPostWithTrustSelfSigned() throws Exception {
+        URI baseUri = new URI(httpsService.getUrl());
+
+        HttpClient client = HttpTool.httpClientBuilder().https(true).trustSelfSigned().build();
+        HttpToolResponse result = HttpTool.httpPost(client, baseUri, ImmutableMap.<String,String>of(), new byte[0]);
+        assertTrue(new String(result.getContent()).contains("Hello, World"), "val="+new String(result.getContent()));
+    }
+}

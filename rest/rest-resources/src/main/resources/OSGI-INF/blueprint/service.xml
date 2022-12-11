@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2015 The Apache Software Foundation.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.2.0"
+           xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core"
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+             http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
+             http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
+
+    <cxf:bus>
+        <cxf:features>
+            <cxf:logging/>
+        </cxf:features>
+    </cxf:bus>
+
+    <cm:property-placeholder persistent-id="org.apache.brooklyn.rest.filter.cors">
+        <cm:default-properties>
+            <cm:property name="cors.enabled" value="true"/>
+            <cm:property name="cors.allow.origins" value=""/>
+            <cm:property name="cors.allow.headers" value=""/>
+            <cm:property name="cors.expose.headers" value=""/>
+            <cm:property name="cors.allow.credentials" value="true"/>
+            <cm:property name="cors.max.age" value="-1"/>
+            <cm:property name="cors.preflight.error.status" value="200"/>
+            <cm:property name="cors.block.if.unauthorized" value="false"/>
+        </cm:default-properties>
+    </cm:property-placeholder>
+
+    <bean class="org.apache.brooklyn.rest.filter.CorsImplSupplierFilter" id="cors-filter">
+        <property name="enableCors" value="${cors.enabled}"/>
+        <property name="allowOrigins" value="${cors.allow.origins}"/>
+        <property name="allowHeaders" value="${cors.allow.headers}"/>
+        <property name="exposeHeaders" value="${cors.expose.headers}"/>
+        <property name="allowCredentials" value="${cors.allow.credentials}"/>
+        <property name="maxAge" value="${cors.max.age}"/>
+        <property name="preflightErrorStatus" value="${cors.preflight.error.status}"/>
+        <property name="blockCorsIfUnauthorized" value="${cors.block.if.unauthorized}"/>
+    </bean>
+
+    <reference id="localManagementContext"
+               interface="org.apache.brooklyn.core.mgmt.internal.ManagementContextInternal"/>
+
+    <reference id="shutdownHandler" interface="org.apache.brooklyn.core.mgmt.ShutdownHandler"/>
+
+    <bean id="accessResourceBean" class="org.apache.brooklyn.rest.resources.AccessResource"/>
+    <bean id="activityResourceBean" class="org.apache.brooklyn.rest.resources.ActivityResource"/>
+    <bean id="adjunctResourceBean" class="org.apache.brooklyn.rest.resources.AdjunctResource"/>
+    <bean id="apidocResourceBean" class="org.apache.brooklyn.rest.resources.ApidocResource"/>
+    <bean id="applicationResourceBean" class="org.apache.brooklyn.rest.resources.ApplicationResource"/>
+    <bean id="bundleResourceBean" class="org.apache.brooklyn.rest.resources.BundleResource"/>
+    <bean id="catalogResourceBean" class="org.apache.brooklyn.rest.resources.CatalogResource"/>
+    <bean id="effectorResourceBean" class="org.apache.brooklyn.rest.resources.EffectorResource"/>
+    <bean id="entityConfigResourceBean" class="org.apache.brooklyn.rest.resources.EntityConfigResource"/>
+    <bean id="entityResourceBean" class="org.apache.brooklyn.rest.resources.EntityResource"/>
+    <bean id="locationResourceBean" class="org.apache.brooklyn.rest.resources.LocationResource"/>
+    <bean id="logoutResourceBean" class="org.apache.brooklyn.rest.resources.LogoutResource"/>
+    <bean id="policyConfigResourceBean" class="org.apache.brooklyn.rest.resources.PolicyConfigResource"/>
+    <bean id="policyResourceBean" class="org.apache.brooklyn.rest.resources.PolicyResource"/>
+    <bean id="scriptResourceBean" class="org.apache.brooklyn.rest.resources.ScriptResource"/>
+    <bean id="sensorResourceBean" class="org.apache.brooklyn.rest.resources.SensorResource"/>
+    <bean id="serverResourceBean" class="org.apache.brooklyn.rest.resources.ServerResource"/>
+    <bean id="typeResourceBean" class="org.apache.brooklyn.rest.resources.TypeResource"/>
+    <bean id="usageResourceBean" class="org.apache.brooklyn.rest.resources.UsageResource"/>
+    <bean id="logbookResourceBean" class="org.apache.brooklyn.rest.resources.LogbookResource"/>
+
+    <jaxrs:server id="brooklynRestApiV1" address="/">
+        <jaxrs:serviceBeans>
+            <ref component-id="accessResourceBean"/>
+            <ref component-id="activityResourceBean"/>
+            <ref component-id="adjunctResourceBean"/>
+            <ref component-id="apidocResourceBean"/>
+            <ref component-id="applicationResourceBean"/>
+            <ref component-id="bundleResourceBean"/>
+            <ref component-id="catalogResourceBean"/>
+            <ref component-id="effectorResourceBean"/>
+            <ref component-id="entityConfigResourceBean"/>
+            <ref component-id="entityResourceBean"/>
+            <ref component-id="locationResourceBean"/>
+            <ref component-id="logoutResourceBean"/>
+            <ref component-id="policyConfigResourceBean"/>
+            <ref component-id="policyResourceBean"/>
+            <ref component-id="scriptResourceBean"/>
+            <ref component-id="sensorResourceBean"/>
+            <ref component-id="serverResourceBean"/>
+            <ref component-id="typeResourceBean"/>
+            <ref component-id="usageResourceBean"/>
+            <ref component-id="logbookResourceBean"/>
+        </jaxrs:serviceBeans>
+
+        <jaxrs:providers>
+            <bean class="org.apache.brooklyn.rest.util.DefaultExceptionMapper"/>
+            <bean class="org.apache.brooklyn.rest.util.json.BrooklynJacksonJsonProvider"/>
+            <bean class="org.apache.brooklyn.rest.util.FormMapProvider"/>
+            <bean class="org.apache.brooklyn.rest.util.ManagementContextProvider">
+                <argument ref="localManagementContext"/>
+            </bean>
+            <bean class="org.apache.brooklyn.rest.filter.BrooklynSecurityProviderFilterJersey"/>
+            <bean class="org.apache.brooklyn.rest.filter.CsrfTokenFilter"/>
+            <bean class="org.apache.brooklyn.rest.filter.RequestTaggingRsFilter"/>
+            <bean class="org.apache.brooklyn.rest.filter.NoCacheFilter"/>
+            <bean class="org.apache.brooklyn.rest.filter.HaHotCheckResourceFilter"/>
+            <bean class="org.apache.brooklyn.rest.filter.EntitlementContextFilter"/>
+            <bean class="org.apache.brooklyn.rest.filter.LoggingResourceFilter"/>
+            <bean class="io.swagger.jaxrs.listing.SwaggerSerializers"/>
+            <bean class="org.apache.brooklyn.rest.util.ShutdownHandlerProvider">
+                <argument ref="shutdownHandler"/>
+            </bean>
+            <ref component-id="cors-filter"/>
+        </jaxrs:providers>
+
+        <jaxrs:properties>
+            <entry key="default.wae.mapper.least.specific" value="true"/>
+        </jaxrs:properties>
+
+    </jaxrs:server>
+
+    <bean class="org.apache.brooklyn.rest.util.ScannerInjectHelper">
+        <property name="server" ref="brooklynRestApiV1"/>
+    </bean>
+    
+</blueprint>

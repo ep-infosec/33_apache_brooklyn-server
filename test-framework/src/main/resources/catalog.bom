@@ -1,0 +1,59 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+brooklyn.catalog:
+    version: "1.1.0-SNAPSHOT" # BROOKLYN_VERSION
+    itemType: entity
+    items:
+    - id: org.apache.brooklyn.test.framework.TestSshCommand
+      item:
+        type: org.apache.brooklyn.test.framework.TestSshCommand
+        name: Test SSH Command
+    - id: org.apache.brooklyn.test.framework.SimpleShellCommandTest
+      item:
+        type: org.apache.brooklyn.test.framework.SimpleShellCommandTest
+        name: "[DEPRECATED] Simple Shell Command Test"
+        description:  "[DEPRECATED] Instead use TestSshCommand"
+        deprecated: true
+    - id: org.apache.brooklyn.test.framework.ParallelTestCase
+      item:
+        type: org.apache.brooklyn.test.framework.ParallelTestCase
+        name: Parallel Test Case
+    - id: org.apache.brooklyn.test.framework.TestCase
+      item:
+        type: org.apache.brooklyn.test.framework.TestCase
+        name: Test Case
+    - id: org.apache.brooklyn.test.framework.InfrastructureDeploymentTestCase
+      item:
+        type: org.apache.brooklyn.test.framework.InfrastructureDeploymentTestCase
+        name: Infrastructure Deployment Test Case
+    - id: org.apache.brooklyn.test.framework.TestSensor
+      item:
+        type: org.apache.brooklyn.test.framework.TestSensor
+        name: Test Sensor
+    - id: org.apache.brooklyn.test.framework.TestEffector
+      item:
+        type: org.apache.brooklyn.test.framework.TestEffector
+        name: Test Effector
+    - id: org.apache.brooklyn.test.framework.TestHttpCall
+      item:
+        type: org.apache.brooklyn.test.framework.TestHttpCall
+        name: Test HTTP Call
+    - id: org.apache.brooklyn.test.framework.LoopOverGroupMembersTestCase
+      item:
+        type: org.apache.brooklyn.test.framework.LoopOverGroupMembersTestCase
+        name: Loop Over Group Members Test Case
